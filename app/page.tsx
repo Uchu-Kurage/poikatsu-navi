@@ -1,114 +1,106 @@
 import Link from "next/link";
-import { rankedSites, overallScore } from "@/data/sites";
+import {
+  sortedCampaigns,
+  featuredCampaigns,
+  campaignStatus,
+  campaigns,
+  categoryMeta,
+  formatPeriod,
+} from "@/data/campaigns";
 import { getAllArticleMeta } from "@/lib/articles";
-import { RankingCard } from "@/components/RankingCard";
-import { Stars } from "@/components/Stars";
+import { CampaignTimeline, TimelineItem } from "@/components/CampaignTimeline";
 
 export default function HomePage() {
-  const ranked = rankedSites();
-  const top3 = ranked.slice(0, 3);
-  const articles = getAllArticleMeta().slice(0, 6);
+  const today = new Date();
+  const items: TimelineItem[] = sortedCampaigns().map((campaign) => ({
+    campaign,
+    status: campaignStatus(campaign, today),
+  }));
+  const featured = featuredCampaigns().slice(0, 3);
+  const activeCount = items.filter((i) => i.status.key !== "ended").length;
+  const articles = getAllArticleMeta().slice(0, 3);
 
   return (
     <>
       {/* Hero */}
       <section className="hero">
         <div className="container">
-          <span className="hero-eyebrow">💰 いま始めるべきポイ活が3分でわかる</span>
+          <span className="hero-eyebrow">🔔 毎日のポイント還元キャンペーンをまとめてチェック</span>
           <h1>
-            <span className="hl">ポイ活</span>で、毎日を<br />ちょっとお得に。
+            <span className="hl">お得なキャンペーン</span>が<br />流れてくるタイムライン。
           </h1>
           <p className="lead">
-            数あるポイントサイトを還元率・使いやすさ・交換のしやすさで徹底比較。
-            初心者の始め方から効率的な稼ぎ方まで、あなたに合ったポイ活が見つかります。
+            PayPay・楽天・dポイントから、クレカ・ふるさと納税・旅行まで。
+            いま参加できるポイント還元キャンペーンを新着順のタイムラインで見逃さない。
           </p>
           <div className="hero-actions">
-            <Link href="/ranking" className="btn btn-primary">ランキングを見る →</Link>
-            <Link href="/articles" className="btn btn-ghost">記事を読む</Link>
+            <Link href="#timeline" className="btn btn-primary">タイムラインを見る →</Link>
+            <Link href="/articles" className="btn btn-ghost">ポイ活の記事を読む</Link>
           </div>
           <div className="hero-stats">
             <div className="hero-stat">
-              <div className="num">{ranked.length}<span style={{ fontSize: 15 }}>サイト</span></div>
-              <div className="label">比較掲載中</div>
+              <div className="num">{campaigns.length}<span style={{ fontSize: 15 }}>件</span></div>
+              <div className="label">掲載キャンペーン</div>
             </div>
             <div className="hero-stat">
-              <div className="num">{getAllArticleMeta().length}<span style={{ fontSize: 15 }}>記事</span></div>
-              <div className="label">お役立ちガイド</div>
+              <div className="num">{activeCount}<span style={{ fontSize: 15 }}>件</span></div>
+              <div className="label">いま参加できる</div>
             </div>
             <div className="hero-stat">
-              <div className="num">300<span style={{ fontSize: 15 }}>円〜</span></div>
-              <div className="label">最短で交換可能</div>
+              <div className="num">{Object.keys(categoryMeta).length}<span style={{ fontSize: 15 }}>分野</span></div>
+              <div className="label">幅広くカバー</div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Ranking */}
+      {/* Featured */}
       <section className="section container">
         <div className="section-head">
           <div>
-            <h2>総合ランキング TOP3</h2>
-            <p className="sub">還元率・ショッピング・アンケート・ゲームの総合評価で厳選</p>
+            <h2>注目のキャンペーン</h2>
+            <p className="sub">いま特に見逃せない高還元・大型キャンペーン</p>
           </div>
-          <Link href="/ranking" className="link-more">すべての比較を見る →</Link>
         </div>
-        <div className="ranking-grid">
-          {top3.map((site, i) => (
-            <RankingCard key={site.id} site={site} rank={i + 1} />
-          ))}
+        <div className="featured-grid">
+          {featured.map((c) => {
+            const st = campaignStatus(c, today);
+            return (
+              <Link href={`/campaigns/${c.id}`} key={c.id} className="featured-card">
+                <div className="fc-glow" style={{ background: categoryMeta[c.category].color }} />
+                <div className="cc-top">
+                  <span className="cc-provider" style={{ background: c.providerColor }}>{c.provider}</span>
+                  <span className={`cc-status st-${st.key}`}>{st.label}</span>
+                </div>
+                <div className="fc-reward" style={{ color: categoryMeta[c.category].color }}>{c.reward}</div>
+                <h3 className="fc-title">{c.title}</h3>
+                <div className="cc-foot">
+                  <span>🗓 {formatPeriod(c)}</span>
+                  <span className="cc-more">詳細を見る →</span>
+                </div>
+              </Link>
+            );
+          })}
         </div>
       </section>
 
-      {/* Comparison teaser */}
-      <section className="section container" style={{ paddingTop: 0 }}>
+      {/* Timeline */}
+      <section className="section container" id="timeline" style={{ paddingTop: 0 }}>
         <div className="section-head">
           <div>
-            <h2>ひと目でわかる比較表</h2>
-            <p className="sub">カテゴリ別の強さと交換条件をまとめてチェック</p>
+            <h2>キャンペーン・タイムライン</h2>
+            <p className="sub">新着順に流れるポイント還元情報。カテゴリや開催状況で絞り込めます</p>
           </div>
-          <Link href="/ranking" className="link-more">詳しく比較する →</Link>
         </div>
-        <div className="table-wrap">
-          <table className="compare">
-            <thead>
-              <tr>
-                <th>サイト</th>
-                <th>総合</th>
-                <th>クレカ</th>
-                <th>買い物</th>
-                <th>アンケート</th>
-                <th>ゲーム</th>
-                <th>最低交換</th>
-              </tr>
-            </thead>
-            <tbody>
-              {ranked.map((site) => (
-                <tr key={site.id}>
-                  <td>
-                    <span className="site-cell">
-                      <span className="dot" style={{ background: site.color }} />
-                      {site.name}
-                    </span>
-                  </td>
-                  <td><strong>{overallScore(site).toFixed(1)}</strong></td>
-                  <td><Stars score={site.ratings.creditCard} /></td>
-                  <td><Stars score={site.ratings.shopping} /></td>
-                  <td><Stars score={site.ratings.survey} /></td>
-                  <td><Stars score={site.ratings.game} /></td>
-                  <td>{site.minWithdrawYen}円〜</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <CampaignTimeline items={items} />
       </section>
 
-      {/* Latest articles */}
+      {/* Articles */}
       <section className="section container" style={{ paddingTop: 0 }}>
         <div className="section-head">
           <div>
-            <h2>新着・人気記事</h2>
-            <p className="sub">始め方から効率化のコツまで、ポイ活のすべて</p>
+            <h2>ポイ活お役立ち記事</h2>
+            <p className="sub">キャンペーンを賢く使いこなすためのコツ</p>
           </div>
           <Link href="/articles" className="link-more">記事一覧へ →</Link>
         </div>
