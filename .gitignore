@@ -24,5 +24,8 @@ yarn-error.log*
 .env
 .env*.local
 
+# collector: 収集レポートは実行ごとの生成物（PR本文に転記するため追跡不要）
+collector/last-run-report.md
+
 # typescript
 *.tsbuildinfo
