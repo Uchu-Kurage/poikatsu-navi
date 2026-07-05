@@ -1,0 +1,46 @@
+name: キャンペーン自動収集
+
+on:
+  schedule:
+    # 毎日 06:00 JST (= 21:00 UTC)
+    - cron: "0 21 * * *"
+  workflow_dispatch: {} # 手動実行
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Collect campaigns
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          # 恒久フィードは collector/sources.config.ts に記載。
+          # 一時的に追加したい場合は下記のように Secrets/Variables で渡せます。
+          # COLLECTOR_FEEDS: ${{ vars.COLLECTOR_FEEDS }}
+        run: npm run collect
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v6
+        with:
+          add-paths: data/campaigns.generated.json
+          branch: campaign-auto-collect
+          delete-branch: true
+          commit-message: "chore: キャンペーン自動収集 (${{ github.run_id }})"
+          title: "キャンペーン自動収集"
+          body-path: collector/last-run-report.md
+          labels: automated, campaigns
