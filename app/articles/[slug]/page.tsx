@@ -50,7 +50,7 @@ export default async function ArticlePage({
       <div style={{ margin: "48px 0 0", padding: "24px", background: "var(--surface)", border: "1px solid var(--border)", borderRadius: "var(--radius)" }}>
         <div style={{ fontWeight: 800, marginBottom: 8 }}>次に読むなら</div>
         <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
-          <Link href="/ranking" className="btn btn-primary">ランキングを見る →</Link>
+          <Link href="/#timeline" className="btn btn-primary">キャンペーンを探す →</Link>
           <Link href="/articles" className="btn btn-ghost">他の記事を読む</Link>
         </div>
       </div>

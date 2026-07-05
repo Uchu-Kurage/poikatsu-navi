@@ -15,9 +15,9 @@ export function Header() {
           <span>ポイ活ナビ</span>
         </Link>
         <nav className="nav">
-          <Link href="/ranking">ランキング</Link>
+          <Link href="/#timeline">タイムライン</Link>
           <Link href="/articles">記事一覧</Link>
-          <Link href="/articles" className="cta">はじめての方へ</Link>
+          <Link href="/#timeline" className="cta">キャンペーンを探す</Link>
         </nav>
       </div>
     </header>
@@ -31,8 +31,8 @@ export function Footer() {
         <div>
           <div style={{ fontWeight: 800, color: "var(--text)", marginBottom: 6 }}>ポイ活ナビ</div>
           <p className="disclaimer">
-            当サイトはポイ活に関する情報をまとめたキュレーションメディアです。掲載している還元率・レート・特典はサンプルを含み、
-            実際の条件は各公式サイトの最新情報をご確認ください。案件によっては広告リンクを含む場合があります。
+            当サイトはポイント還元キャンペーン情報をタイムライン形式でまとめたキュレーションメディアです。掲載している還元率・期間・条件はサンプルを含み、
+            実際の内容は各公式ページの最新情報をご確認ください。キャンペーンによっては広告リンクを含む場合があります。
           </p>
         </div>
         <div>© {new Date().getFullYear()} ポイ活ナビ</div>
